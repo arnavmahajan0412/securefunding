@@ -7,10 +7,15 @@ contract Project{
     string projectDescription;
     uint256[] timeline;
     uint256 targetAmount;
-    uint256 minimumContribution;
+    uint256 public minimumContribution;
     uint256 numberOfContributors;
     uint256 raisedAmount;
     
+    mapping(address=>uint256) public contributorsList;
+
+
+    event FundingReceived(address contributor, uint amount, uint currentTotal);
+
     constructor(address payable _projectCreator,
     string memory _projectName,
     string memory _projectDescription,
@@ -27,6 +32,20 @@ contract Project{
 
     }
     
+    //Contribution amount
+    function contribution(address _contributor)public payable{
+        // require(msg.value>=minimumContribution,'Contribution amount is too low !');
+        if(contributorsList[_contributor]==0){
+            numberOfContributors++;
+        }
+        contributorsList[_contributor]+=msg.value;
+        raisedAmount+=msg.value;
+        emit FundingReceived(_contributor,msg.value,raisedAmount);
+    }
+
+
+
+    //Get project details in frontend
     function getProjectDetails() external view returns(
     address payable projectStarter,
     uint256 minContribution,
@@ -44,6 +63,8 @@ contract Project{
         title=projectName;
         desc=projectDescription;
     }
+
+
     
 
 }

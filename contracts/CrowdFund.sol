@@ -19,7 +19,11 @@ contract CrowdFund{
     uint256 raisedAmount);
 
     
-    event fundingReceived();
+    event fundingReceived(
+      Project projectAddress,
+      uint256 amountRecieved,
+      address indexed contributor
+    );
 
     //Creating new projects
     function createProject(
@@ -50,6 +54,7 @@ contract CrowdFund{
 
     }
 
+
     function getProjectDetails() public view returns(Project[]  memory) {
       return projectsCreated;
     }
@@ -72,6 +77,13 @@ contract CrowdFund{
         return _project.getProjectDetails();
       }
 
-  
+      function contribute(Project _projectAddress) public payable{
+         
+        // Project projectInstance= Project(_projectAddress);
+         uint256 minAmount=Project(_projectAddress).minimumContribution();
+         require(msg.value>minAmount, 'Contribution amount is low !');
+         Project(_projectAddress).contribution{value:msg.value}(msg.sender);
+         emit fundingReceived(_projectAddress, msg.value, msg.sender);
+      }
     
 }
