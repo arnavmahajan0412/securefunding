@@ -26,6 +26,7 @@ contract CrowdFund{
     );
 
     //Creating new projects
+    
     function createProject(
     string memory projectName, string memory projectDescription,
     uint256[] memory timeline,uint256 targetAmount,uint256 minimumContribution) public {
@@ -37,7 +38,7 @@ contract CrowdFund{
     targetAmount,
     minimumContribution);
 
-    //Add created project in array
+    //Add created project in an array
     projectsCreated.push(newProject);
     
     //Start project
@@ -59,7 +60,9 @@ contract CrowdFund{
       return projectsCreated;
     }
     Project  public objectAdd;
+
     //Temporary function to show details
+
     function storeAdd(Project p) public{
         objectAdd=p;
     }
