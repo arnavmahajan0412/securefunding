@@ -2,6 +2,7 @@
 pragma solidity >=0.7.0 <0.9.0;
 import './Project.sol';
 
+
 contract CrowdFund{
 
     Project[] private projectsCreated;
@@ -28,6 +29,7 @@ contract CrowdFund{
     );
 
     //Creating new projects
+
     function createProject(
     string memory projectName, string memory projectDescription,
     uint256[] memory timeline,uint256 targetAmount,uint256 minimumContribution, uint256 fundraisingDeadline) public {
@@ -40,7 +42,7 @@ contract CrowdFund{
     minimumContribution,
     fundraisingDeadline);
 
-    //Add created project in array
+    //Add created project in an array
     projectsCreated.push(newProject);
     
     //Start project
@@ -64,7 +66,9 @@ contract CrowdFund{
       return projectsCreated;
     }
     Project  public objectAdd;
+
     //Temporary function to show details
+
     function storeAdd(Project p) public{
         objectAdd=p;
     }
