@@ -7,7 +7,7 @@ contract CrowdFund{
 
     Project[] private projectsCreated;
 
-
+    //Event for new project
     event projectStarted(
     Project projectAddress,
     address projectCreator,
@@ -21,7 +21,7 @@ contract CrowdFund{
     uint256 fundraisingDeadline
     );
 
-    
+    //Event for every new funding
     event fundingReceived(
       Project projectAddress,
       uint256 amountRecieved,
