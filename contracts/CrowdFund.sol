@@ -16,7 +16,9 @@ contract CrowdFund{
     uint256 targetAmount,
     uint256 minimumContribution,
     uint256 numberOfContributors,
-    uint256 raisedAmount);
+    uint256 raisedAmount,
+    uint256 fundraisingDeadline
+    );
 
     
     event fundingReceived(
@@ -28,14 +30,15 @@ contract CrowdFund{
     //Creating new projects
     function createProject(
     string memory projectName, string memory projectDescription,
-    uint256[] memory timeline,uint256 targetAmount,uint256 minimumContribution) public {
+    uint256[] memory timeline,uint256 targetAmount,uint256 minimumContribution, uint256 fundraisingDeadline) public {
 
     Project newProject= new Project(payable(msg.sender),
     projectName,
     projectDescription,
     timeline,
     targetAmount,
-    minimumContribution);
+    minimumContribution,
+    fundraisingDeadline);
 
     //Add created project in array
     projectsCreated.push(newProject);
@@ -50,12 +53,14 @@ contract CrowdFund{
     targetAmount,
     minimumContribution,
     0,
-    0);
+    0,
+    fundraisingDeadline
+    );
 
     }
 
 
-    function getProjectDetails() public view returns(Project[]  memory) {
+    function getTotalProjects() public view returns(Project[]  memory) {
       return projectsCreated;
     }
     Project  public objectAdd;
@@ -70,13 +75,18 @@ contract CrowdFund{
     uint256 goalAmount,
     uint256 currentAmount, 
     string memory title,
-    string memory desc){
+    string memory desc,
+    uint256 fundraisingDeadline
+    ){
         Project _project;
          
         _project=Project(objectAdd);
         return _project.getProjectDetails();
       }
 
+
+      //Contribute in a project
+      // For investors
       function contribute(Project _projectAddress) public payable{
          
         // Project projectInstance= Project(_projectAddress);

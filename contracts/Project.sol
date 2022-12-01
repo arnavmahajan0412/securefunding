@@ -10,6 +10,7 @@ contract Project{
     uint256 public minimumContribution;
     uint256 numberOfContributors;
     uint256 raisedAmount;
+    uint256 fundraisingDeadline;
     
     mapping(address=>uint256) public contributorsList;
 
@@ -21,7 +22,8 @@ contract Project{
     string memory _projectDescription,
     uint256[] memory _timeline,
     uint256 _targetAmount,
-    uint256 _minimumContribution
+    uint256 _minimumContribution,
+    uint256 _fundraisinDeadline
     ) {
             projectCreator=_projectCreator;
             projectName=_projectName;
@@ -29,7 +31,7 @@ contract Project{
             timeline=_timeline;
             targetAmount=_targetAmount;
             minimumContribution=_minimumContribution;
-
+            fundraisingDeadline=_fundraisinDeadline;
     }
     
     //Contribution amount
@@ -53,7 +55,8 @@ contract Project{
     uint256 goalAmount,
     uint256 currentAmount, 
     string memory title,
-    string memory desc
+    string memory desc,
+    uint256 fundraisingTime
     ){
         projectStarter=projectCreator;
         minContribution=minimumContribution;
@@ -62,6 +65,7 @@ contract Project{
         currentAmount=raisedAmount;
         title=projectName;
         desc=projectDescription;
+        fundraisingTime=fundraisingDeadline;
     }
 
 
