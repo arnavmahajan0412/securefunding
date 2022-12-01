@@ -12,9 +12,10 @@ contract Project{
     uint256 raisedAmount;
     uint256 fundraisingDeadline;
     
+    //Map investors with the amount contributed
     mapping(address=>uint256) public contributorsList;
 
-
+    //Event for funds recieved from investors
     event FundingReceived(address contributor, uint amount, uint currentTotal);
 
     constructor(address payable _projectCreator,
@@ -48,6 +49,9 @@ contract Project{
 
 
     //Get project details in frontend
+    //For the investors
+
+    //To be used after intergration with front end
     function getProjectDetails() external view returns(
     address payable projectStarter,
     uint256 minContribution,

@@ -61,18 +61,19 @@ contract CrowdFund{
 
     }
 
-
+    //get array of total project 
     function getTotalProjects() public view returns(Project[]  memory) {
       return projectsCreated;
     }
     Project  public objectAdd;
 
-    //Temporary function to show details
+    //Temporary function to store hash of project
 
     function storeAdd(Project p) public{
         objectAdd=p;
     }
 
+    //Function returns the detail of particular project
     function getProjectInformation() public view returns(address payable projectStarter,
     uint256 minContribution,
     uint256 projectDeadline,
