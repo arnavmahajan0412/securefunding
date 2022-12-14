@@ -10,10 +10,12 @@ contract Project{
     uint256 public minimumContribution;
     uint256 numberOfContributors;
     uint256 raisedAmount;
+    uint256 fundraisingDeadline;
     
+    //Map investors with the amount contributed
     mapping(address=>uint256) public contributorsList;
 
-
+    //Event for funds recieved from investors
     event FundingReceived(address contributor, uint amount, uint currentTotal);
 
     constructor(address payable _projectCreator,
@@ -21,7 +23,8 @@ contract Project{
     string memory _projectDescription,
     uint256[] memory _timeline,
     uint256 _targetAmount,
-    uint256 _minimumContribution
+    uint256 _minimumContribution,
+    uint256 _fundraisinDeadline
     ) {
             projectCreator=_projectCreator;
             projectName=_projectName;
@@ -29,7 +32,7 @@ contract Project{
             timeline=_timeline;
             targetAmount=_targetAmount;
             minimumContribution=_minimumContribution;
-
+            fundraisingDeadline=_fundraisinDeadline;
     }
     
     //Contribution amount
@@ -46,6 +49,9 @@ contract Project{
 
 
     //Get project details in frontend
+    //For the investors
+
+    //To be used after intergration with front end
     function getProjectDetails() external view returns(
     address payable projectStarter,
     uint256 minContribution,
@@ -53,7 +59,8 @@ contract Project{
     uint256 goalAmount,
     uint256 currentAmount, 
     string memory title,
-    string memory desc
+    string memory desc,
+    uint256 fundraisingTime
     ){
         projectStarter=projectCreator;
         minContribution=minimumContribution;
@@ -62,6 +69,7 @@ contract Project{
         currentAmount=raisedAmount;
         title=projectName;
         desc=projectDescription;
+        fundraisingTime=fundraisingDeadline;
     }
 
 

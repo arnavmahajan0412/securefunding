@@ -7,7 +7,7 @@ contract CrowdFund{
 
     Project[] private projectsCreated;
 
-
+    //Event for new project
     event projectStarted(
     Project projectAddress,
     address projectCreator,
@@ -17,9 +17,11 @@ contract CrowdFund{
     uint256 targetAmount,
     uint256 minimumContribution,
     uint256 numberOfContributors,
-    uint256 raisedAmount);
+    uint256 raisedAmount,
+    uint256 fundraisingDeadline
+    );
 
-    
+    //Event for every new funding
     event fundingReceived(
       Project projectAddress,
       uint256 amountRecieved,
@@ -30,14 +32,15 @@ contract CrowdFund{
 
     function createProject(
     string memory projectName, string memory projectDescription,
-    uint256[] memory timeline,uint256 targetAmount,uint256 minimumContribution) public {
+    uint256[] memory timeline,uint256 targetAmount,uint256 minimumContribution, uint256 fundraisingDeadline) public {
 
     Project newProject= new Project(payable(msg.sender),
     projectName,
     projectDescription,
     timeline,
     targetAmount,
-    minimumContribution);
+    minimumContribution,
+    fundraisingDeadline);
 
     //Add created project in an array
     projectsCreated.push(newProject);
@@ -52,35 +55,43 @@ contract CrowdFund{
     targetAmount,
     minimumContribution,
     0,
-    0);
+    0,
+    fundraisingDeadline
+    );
 
     }
 
-
-    function getProjectDetails() public view returns(Project[]  memory) {
+    //get array of total project 
+    function getTotalProjects() public view returns(Project[]  memory) {
       return projectsCreated;
     }
     Project  public objectAdd;
 
-    //Temporary function to show details
+    //Temporary function to store hash of project
 
     function storeAdd(Project p) public{
         objectAdd=p;
     }
 
+    //Function returns the detail of particular project
     function getProjectInformation() public view returns(address payable projectStarter,
     uint256 minContribution,
     uint256 projectDeadline,
     uint256 goalAmount,
     uint256 currentAmount, 
     string memory title,
-    string memory desc){
+    string memory desc,
+    uint256 fundraisingDeadline
+    ){
         Project _project;
          
         _project=Project(objectAdd);
         return _project.getProjectDetails();
       }
 
+
+      //Contribute in a project
+      // For investors
       function contribute(Project _projectAddress) public payable{
          
         // Project projectInstance= Project(_projectAddress);
