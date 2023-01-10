@@ -5,9 +5,10 @@ import './Project.sol';
 
 contract CrowdFund{
 
+  
     Project[] private projectsCreated;
 
-    //Event for new project
+
     event projectStarted(
     Project projectAddress,
     address projectCreator,
@@ -18,10 +19,11 @@ contract CrowdFund{
     uint256 minimumContribution,
     uint256 numberOfContributors,
     uint256 raisedAmount,
-    uint256 fundraisingDeadline
+    uint256 fundraisingDeadline,
+    uint256 CurrentState
     );
 
-    //Event for every new funding
+    
     event fundingReceived(
       Project projectAddress,
       uint256 amountRecieved,
@@ -29,7 +31,6 @@ contract CrowdFund{
     );
 
     //Creating new projects
-
     function createProject(
     string memory projectName, string memory projectDescription,
     uint256[] memory timeline,uint256 targetAmount,uint256 minimumContribution, uint256 fundraisingDeadline) public {
@@ -42,7 +43,7 @@ contract CrowdFund{
     minimumContribution,
     fundraisingDeadline);
 
-    //Add created project in an array
+    //Add created project in array
     projectsCreated.push(newProject);
     
     //Start project
@@ -56,24 +57,22 @@ contract CrowdFund{
     minimumContribution,
     0,
     0,
-    fundraisingDeadline
+    fundraisingDeadline,
+    0
     );
 
     }
 
-    //get array of total project 
+
     function getTotalProjects() public view returns(Project[]  memory) {
       return projectsCreated;
     }
     Project  public objectAdd;
-
-    //Temporary function to store hash of project
-
+    //Temporary function to show details
     function storeAdd(Project p) public{
         objectAdd=p;
     }
 
-    //Function returns the detail of particular project
     function getProjectInformation() public view returns(address payable projectStarter,
     uint256 minContribution,
     uint256 projectDeadline,
@@ -81,7 +80,8 @@ contract CrowdFund{
     uint256 currentAmount, 
     string memory title,
     string memory desc,
-    uint256 fundraisingDeadline
+    uint256 fundraisingDL,
+    Types.ProjectStates CurrentProjectState
     ){
         Project _project;
          
@@ -89,12 +89,14 @@ contract CrowdFund{
         return _project.getProjectDetails();
       }
 
+    
+
 
       //Contribute in a project
       // For investors
       function contribute(Project _projectAddress) public payable{
          
-        // Project projectInstance= Project(_projectAddress);
+        //Get minimum require amount for project from another contract 
          uint256 minAmount=Project(_projectAddress).minimumContribution();
          require(msg.value>minAmount, 'Contribution amount is low !');
          Project(_projectAddress).contribution{value:msg.value}(msg.sender);

@@ -1,7 +1,29 @@
 // SPDX-License-Identifier: MIT
 pragma solidity >=0.7.0 <0.9.0;
 
+library Types{
+//USing enum in library for test smart contract
+      enum ProjectStates{
+        Fundraising,
+        Expired,
+        Successfull
+    }
+
+}
+
 contract Project{
+
+
+    //States For project(Only for fundraising) 
+    // Fundraising= The campaign is accepting funds 
+    // expired= Campaign is expired and deadline is passed
+    //Successfull= Total amount for the project is received and now the campaign will no receive fund as well
+    //  enum ProjectStates{
+    //     Fundraising,
+    //     Expired,
+    //     Successfull
+    // }
+
     address payable projectCreator;
     string projectName;
     string projectDescription;
@@ -11,11 +33,12 @@ contract Project{
     uint256 numberOfContributors;
     uint256 raisedAmount;
     uint256 fundraisingDeadline;
+    Types.ProjectStates public ProjectCurrentState= Types.ProjectStates.Fundraising;
     
-    //Map investors with the amount contributed
     mapping(address=>uint256) public contributorsList;
 
-    //Event for funds recieved from investors
+  
+
     event FundingReceived(address contributor, uint amount, uint currentTotal);
 
     constructor(address payable _projectCreator,
@@ -49,9 +72,6 @@ contract Project{
 
 
     //Get project details in frontend
-    //For the investors
-
-    //To be used after intergration with front end
     function getProjectDetails() external view returns(
     address payable projectStarter,
     uint256 minContribution,
@@ -60,7 +80,8 @@ contract Project{
     uint256 currentAmount, 
     string memory title,
     string memory desc,
-    uint256 fundraisingTime
+    uint256 fundraisingDl,
+    Types.ProjectStates currentState
     ){
         projectStarter=projectCreator;
         minContribution=minimumContribution;
@@ -69,7 +90,8 @@ contract Project{
         currentAmount=raisedAmount;
         title=projectName;
         desc=projectDescription;
-        fundraisingTime=fundraisingDeadline;
+        fundraisingDl=fundraisingDeadline;
+        currentState=ProjectCurrentState;
     }
 
 
