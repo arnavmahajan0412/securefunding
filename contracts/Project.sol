@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: MIT
 pragma solidity >=0.7.0 <0.9.0;
 
+//Using library only for testing smart contract
 library Types{
-//USing enum in library for test smart contract
       enum ProjectStates{
         Fundraising,
         Expired,
@@ -58,18 +58,56 @@ contract Project{
             fundraisingDeadline=_fundraisinDeadline;
     }
     
+    //creating access only for 
+    modifier _isCreater(){
+        require(msg.sender== projectCreator,'No Access!');
+        _;
+    }
+    //Checking project state for funding 
+    modifier _validateExpiryForFunding(Types.ProjectStates _state){
+     require(ProjectCurrentState==_state,'Invalid State Cannot Invest in this campaign');
+     require(block.timestamp<fundraisingDeadline,'Deadline Passed!');
+     _;
+    }
+    //Check project state for refund
+    modifier _validateExpiry(Types.ProjectStates _state){
+     require(ProjectCurrentState==_state,'Cannot Refund as campaign is not expired!');   
+     _;
+    }
+
+    
     //Contribution amount
-    function contribution(address _contributor)public payable{
-        // require(msg.value>=minimumContribution,'Contribution amount is too low !');
+    function contribution(address _contributor)public _validateExpiryForFunding(Types.ProjectStates.Fundraising) payable{
+        require(msg.value>=minimumContribution,'Contribution amount too low !');
         if(contributorsList[_contributor]==0){
             numberOfContributors++;
         }
         contributorsList[_contributor]+=msg.value;
         raisedAmount+=msg.value;
         emit FundingReceived(_contributor,msg.value,raisedAmount);
+        checkCampaignStatus();
     }
 
+    //Checking campaign funding status
+    //check if campaign has got complete funding
+    //check if deadline of campaign is passed
+    function checkCampaignStatus()internal{
+        if(raisedAmount>=targetAmount){
+            ProjectCurrentState=Types.ProjectStates.Successfull;
+        }
+        else if(block.timestamp>=fundraisingDeadline){
+            ProjectCurrentState=Types.ProjectStates.Expired;
+        }
+    }
 
+    //Refunding Amount if the campaign gets expired
+    function refundInvestorsFund()public _validateExpiry(Types.ProjectStates.Expired) returns(bool){
+        require(contributorsList[msg.sender] > 0, 'You didnt contributed any amount to this project!');
+        address payable user = payable(msg.sender);
+        user.transfer(contributorsList[msg.sender]);
+        contributorsList[msg.sender] = 0;
+        return true;
+    }
 
     //Get project details in frontend
     function getProjectDetails() external view returns(
