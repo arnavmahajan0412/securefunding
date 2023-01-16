@@ -68,7 +68,7 @@ contract CrowdFund{
       return projectsCreated;
     }
     Project  public objectAdd;
-    //Temporary function to show details
+    //Temporary functions access data from another smart contract
     function storeAdd(Project p) public{
         objectAdd=p;
     }
@@ -91,7 +91,8 @@ contract CrowdFund{
 
     
 
-
+      //only for smart contract testing purpose
+      //Don't use for frontend
       //Contribute in a project
       // For investors
       function contribute(Project _projectAddress) public payable{
@@ -102,5 +103,32 @@ contract CrowdFund{
          Project(_projectAddress).contribution{value:msg.value}(msg.sender);
          emit fundingReceived(_projectAddress, msg.value, msg.sender);
       }
-    
+      //request refund for project
+      function createRefundRequest()public {
+        Project _project;
+        _project=Project(objectAdd);
+        // _project.refundInvestorsFund(msg.sender);
+      }
+      //create request for fund 
+      function CreateFundRequest(string memory _description,string memory _IPFSfileHash, uint256 _amount)public {
+        Project _project;
+        _project=Project(objectAdd);
+        _project.createFundRequest(_description,_IPFSfileHash,_amount,payable(msg.sender));
+      }
+      function withdrawlVoting(uint256 requestID)public{
+        Project _project;
+        _project=Project(objectAdd);
+        _project.VoteForWithdrawal(requestID);
+      }
+      function withdrawAmount(uint256 requestID)public{
+        Project _project;
+        _project=Project(objectAdd);
+        _project.WithdrawRequestedAmount(requestID);
+      }
+    function getProjectBalance()public view returns(uint256 amount){
+       Project _project;
+        _project=Project(objectAdd);
+        return _project.raisedAmount();
+    }
+
 }

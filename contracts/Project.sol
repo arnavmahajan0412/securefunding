@@ -41,7 +41,7 @@ contract Project{
     uint256 targetAmount;
     uint256 public minimumContribution;
     uint256 numberOfContributors;
-    uint256 raisedAmount;
+    uint256 public raisedAmount;
     uint256 fundraisingDeadline;
     Types.ProjectStates public ProjectCurrentState= Types.ProjectStates.Fundraising;
     
@@ -50,7 +50,7 @@ contract Project{
    
     //Number of request made for fund withdrawal
     uint256 public numOfWithdrawRequests = 0;
-  
+    uint256 public amountRemaining=raisedAmount;
     //Event for funding received
     event FundingReceived(address contributor, uint amount, uint currentTotal);
     //event for creating request for fund
@@ -110,6 +110,7 @@ contract Project{
     }
     //Check project state for refund
     modifier _validateExpiry(Types.ProjectStates _state){
+     checkCampaignStatus();
      require(ProjectCurrentState==_state,'Invalid State!');   
      _;
     }
@@ -141,9 +142,10 @@ contract Project{
 
     //Refunding Amount if the campaign gets expired
     function refundInvestorsFund()public _validateExpiry(Types.ProjectStates.Expired) returns(bool){
-        require(contributorsList[msg.sender] > 0, 'You didnt contributed any amount to this project!');
+        require(contributorsList[msg.sender] > 0, 'Your contribution to this project is 0!');
         address payable user = payable(msg.sender);
         user.transfer(contributorsList[msg.sender]);
+        raisedAmount-=contributorsList[msg.sender];
         contributorsList[msg.sender] = 0;
         return true;
     }
@@ -151,15 +153,16 @@ contract Project{
 
     //Request for funds from front end
     function createFundRequest(string memory _description,string memory _IPFSfileHash, uint256 _amount,address payable _reciptent)public _isCreater() _validateExpiry(Types.ProjectStates.Successfull){
+        require(timeline.length>=numOfWithdrawRequests,'Cannot withdraw funds all request has been completed' );
+        require(timeline[numOfWithdrawRequests]<=block.timestamp,'The timeline passed');
         withdrawRequest storage newRequest=withdrawRequests[numOfWithdrawRequests];
-        numOfWithdrawRequests++;
+        
         newRequest.description=_description;
         newRequest.ipfsFileHash=_IPFSfileHash;
         newRequest.amount=_amount;
         newRequest.noOfVotes=0;
         newRequest.isCompleted=false;
         newRequest.reciptent=_reciptent;
-
         emit FundWithdrawRequest(
             numOfWithdrawRequests,
             _description,
@@ -170,7 +173,9 @@ contract Project{
             _reciptent
 
         );
+        numOfWithdrawRequests++;
     }
+
 
     //Function for votiing of withdrawl
     function VoteForWithdrawal(uint256 _requestID)public {
@@ -215,6 +220,7 @@ contract Project{
     uint256 fundraisingDl,
     Types.ProjectStates currentState
     ){
+        
         projectStarter=projectCreator;
         minContribution=minimumContribution;
         projectDeadline=timeline[timeline.length-1];
@@ -226,7 +232,8 @@ contract Project{
         currentState=ProjectCurrentState;
     }
 
-
+    
     
 
 }
+
