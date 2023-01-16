@@ -23,7 +23,17 @@ contract Project{
     //     Expired,
     //     Successfull
     // }
-
+     //Struct for request
+    struct withdrawRequest{
+        string description;
+        string ipfsFileHash;
+        uint256 amount;
+        uint256 noOfVotes;
+        mapping(address => bool) voters;
+        bool isCompleted;
+        address payable reciptent;
+    }
+    //Variables
     address payable projectCreator;
     string projectName;
     string projectDescription;
@@ -36,10 +46,39 @@ contract Project{
     Types.ProjectStates public ProjectCurrentState= Types.ProjectStates.Fundraising;
     
     mapping(address=>uint256) public contributorsList;
-
+    mapping(uint256=>withdrawRequest) public withdrawRequests;
+   
+    //Number of request made for fund withdrawal
+    uint256 public numOfWithdrawRequests = 0;
   
-
+    //Event for funding received
     event FundingReceived(address contributor, uint amount, uint currentTotal);
+    //event for creating request for fund
+    event FundWithdrawRequest(
+        uint256 requestId,
+        string description,
+        string ipfsFileHash,
+        uint256 amount,
+        uint256 noOfVotes,
+        bool isCompleted,
+        address reciptent
+    );
+    //Event for voting of fund withdrawl only done by investor
+    event VoteForFundWithdrawl(
+        address voter,
+        uint256 voteCount
+    );
+    //Event for successfull withdrawl of funds
+    event WithdrawlSuccessful(
+        uint256 requestId,
+        string description,
+        string ipfsFileHash,
+        uint256 amount,
+        uint256 noOfVotes,
+        bool isCompleted,
+        address reciptent
+    );
+
 
     constructor(address payable _projectCreator,
     string memory _projectName,
@@ -71,7 +110,7 @@ contract Project{
     }
     //Check project state for refund
     modifier _validateExpiry(Types.ProjectStates _state){
-     require(ProjectCurrentState==_state,'Cannot Refund as campaign is not expired!');   
+     require(ProjectCurrentState==_state,'Invalid State!');   
      _;
     }
 
@@ -107,6 +146,61 @@ contract Project{
         user.transfer(contributorsList[msg.sender]);
         contributorsList[msg.sender] = 0;
         return true;
+    }
+
+
+    //Request for funds from front end
+    function createFundRequest(string memory _description,string memory _IPFSfileHash, uint256 _amount,address payable _reciptent)public _isCreater() _validateExpiry(Types.ProjectStates.Successfull){
+        withdrawRequest storage newRequest=withdrawRequests[numOfWithdrawRequests];
+        numOfWithdrawRequests++;
+        newRequest.description=_description;
+        newRequest.ipfsFileHash=_IPFSfileHash;
+        newRequest.amount=_amount;
+        newRequest.noOfVotes=0;
+        newRequest.isCompleted=false;
+        newRequest.reciptent=_reciptent;
+
+        emit FundWithdrawRequest(
+            numOfWithdrawRequests,
+            _description,
+            _IPFSfileHash,
+            _amount,
+            0,
+            false,
+            _reciptent
+
+        );
+    }
+
+    //Function for votiing of withdrawl
+    function VoteForWithdrawal(uint256 _requestID)public {
+        require(contributorsList[msg.sender]>0,'Only contributors can vote for the campaign');
+        withdrawRequest storage requestDetails = withdrawRequests[_requestID];
+        require(requestDetails.voters[msg.sender]==false,'Youve voted for this campaign');
+        requestDetails.voters[msg.sender]==true;
+        requestDetails.noOfVotes+=1;
+        emit VoteForFundWithdrawl(
+            msg.sender,
+            requestDetails.noOfVotes
+        );
+    }
+
+    //withdraw requested amount
+    function WithdrawRequestedAmount(uint256 _requestID)public _isCreater() _validateExpiry(Types.ProjectStates.Successfull){
+        withdrawRequest storage RequestDetails =withdrawRequests[_requestID];
+        require(RequestDetails.isCompleted==false,'Request Completed already');
+        require(RequestDetails.noOfVotes>numberOfContributors/2,'Vote percentage is less than 50% cannot withdraw fund');
+        RequestDetails.reciptent.transfer(RequestDetails.amount);
+        RequestDetails.isCompleted=true;
+        emit WithdrawlSuccessful(
+            _requestID,
+            RequestDetails.description,
+            RequestDetails.ipfsFileHash,
+            RequestDetails.amount,
+            RequestDetails.noOfVotes,
+            true,
+            RequestDetails.reciptent
+        );
     }
 
     //Get project details in frontend
