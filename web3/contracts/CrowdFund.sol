@@ -75,7 +75,7 @@ contract CrowdFund{
 
     function getProjectInformation() public view returns(address payable projectStarter,
     uint256 minContribution,
-    uint256 projectDeadline,
+    uint256[] memory projectDeadline,
     uint256 goalAmount,
     uint256 currentAmount, 
     string memory title,
@@ -104,9 +104,10 @@ contract CrowdFund{
          emit fundingReceived(_projectAddress, msg.value, msg.sender);
       }
       //request refund for project
-      function createRefundRequest()public {
+      function createRefundRequest()public view{
         Project _project;
         _project=Project(objectAdd);
+      //  Below comment is only for testing project smartcontract
         // _project.refundInvestorsFund(msg.sender);
       }
       //create request for fund 

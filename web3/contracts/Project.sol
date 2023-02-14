@@ -212,7 +212,7 @@ contract Project{
     function getProjectDetails() external view returns(
     address payable projectStarter,
     uint256 minContribution,
-    uint256 projectDeadline,
+    uint256[] memory projectDeadline,
     uint256 goalAmount,
     uint256 currentAmount, 
     string memory title,
@@ -223,7 +223,7 @@ contract Project{
         
         projectStarter=projectCreator;
         minContribution=minimumContribution;
-        projectDeadline=timeline[timeline.length-1];
+        projectDeadline=timeline;
         goalAmount=targetAmount;
         currentAmount=raisedAmount;
         title=projectName;
