@@ -40,7 +40,7 @@ contract Project{
     uint256[] timeline;
     uint256 targetAmount;
     uint256 public minimumContribution;
-    uint256 numberOfContributors;
+    uint256 public numberOfContributors;
     uint256 public raisedAmount;
     uint256 fundraisingDeadline;
     Types.ProjectStates public ProjectCurrentState= Types.ProjectStates.Fundraising;
@@ -51,6 +51,7 @@ contract Project{
     //Number of request made for fund withdrawal
     uint256 public numOfWithdrawRequests = 0;
     uint256 public amountRemaining=raisedAmount;
+    uint256 public TotalvoteCount=0;
     //Event for funding received
     event FundingReceived(address contributor, uint amount, uint currentTotal);
     //event for creating request for fund
@@ -154,7 +155,7 @@ contract Project{
     //Request for funds from front end
     function createFundRequest(string memory _description,string memory _IPFSfileHash, uint256 _amount,address payable _reciptent)public _isCreater() _validateExpiry(Types.ProjectStates.Successfull){
         require(timeline.length>=numOfWithdrawRequests,'Cannot withdraw funds all request has been completed' );
-        require(timeline[numOfWithdrawRequests]<=block.timestamp,'The timeline passed');
+        // require(timeline[numOfWithdrawRequests]<=block.timestamp,'The timeline passed');
         withdrawRequest storage newRequest=withdrawRequests[numOfWithdrawRequests];
         
         newRequest.description=_description;
@@ -184,6 +185,7 @@ contract Project{
         require(requestDetails.voters[msg.sender]==false,'Youve voted for this campaign');
         requestDetails.voters[msg.sender]==true;
         requestDetails.noOfVotes+=1;
+        TotalvoteCount+=1;
         emit VoteForFundWithdrawl(
             msg.sender,
             requestDetails.noOfVotes
@@ -232,6 +234,14 @@ contract Project{
         currentState=ProjectCurrentState;
     }
 
+
+    function getRequestsCount()public view returns(uint256){
+        return numOfWithdrawRequests;
+    }
+
+    function getVoterCount() public view returns(uint256){
+        return numberOfContributors;
+    }
     
     
 
